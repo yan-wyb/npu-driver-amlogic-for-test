@@ -38,6 +38,7 @@ gcdSTATIC_LINK      ?= 0
 VIVANTE_ENABLE_2D   ?= 1
 VIVANTE_ENABLE_VG   ?= 0
 VIVANTE_ENABLE_3D   ?= 1
+VIVANTE_NO_GL4      ?= 0
 VIVANTE_NO_VG       ?= 0
 
 LINUX_EMULATOR      ?= 0
@@ -46,6 +47,7 @@ NO_KERNEL           ?= 0
 
 USE_OPENCL          ?= 1
 USE_OPENVX          ?= 1
+USE_OVXLIB          ?= 0
 USE_VULKAN          ?= 0
 USE_VDK             ?= 0
 
@@ -66,7 +68,7 @@ BANK_BIT_END        ?= 0
 BANK_CHANNEL_BIT    ?= 0
 
 USE_LOADTIME_OPT    ?= 1
-YOCTO_DRI_BUILD     ?= 0
+GL4_DRI_BUILD       ?= 0
 VSC_VIR_BUILD       ?= 1
 USE_EXA_G2D         ?= 0
 GL4_LINUX_ENABLE    ?= 1
@@ -111,6 +113,11 @@ ifeq ($(gcdSTATIC_LINK),1)
   GL_11_APPENDIX    ?= _es11
   GL_2_APPENDIX     ?= _es2
   GL_3_APPENDIX     ?= _es3
+endif
+
+ifeq ($(USE_OPENVX),1)
+   OPENVX_MAJOR_VERSION ?= 1
+   OPENVX_SUB_VERSION ?= 2
 endif
 
 ifneq ($(LINUX_OABI),1)
@@ -163,9 +170,8 @@ PKG_CONFIG          ?= $(CROSS_COMPILE)pkg-config
 # Resource.
 
 KERNEL_DIR          ?=
+ROOTFS              ?=
 TOOL_DIR            ?= /home/software/Linux
-X11_ARM_DIR         ?= $(TOOL_DIR)/X11_ARM
-ROOTFS_USR          ?= $(TOOL_DIR)/RootFS/usr
 WAYLAND_DIR         ?= $(TOOL_DIR)/wayland
 
 VIVANTE_SDK_DIR     ?= $(AQROOT)/build/sdk
@@ -280,6 +286,10 @@ CFLAGS              += -DgcdENABLE_3D=$(VIVANTE_ENABLE_3D)
 CFLAGS              += -DgcdENABLE_2D=$(VIVANTE_ENABLE_2D)
 CFLAGS              += -DgcdENABLE_VG=$(VIVANTE_ENABLE_VG)
 
+ifeq ($(VIVANTE_NO_GL4),1)
+  CFLAGS            += -DVIVANTE_NO_GL4
+endif
+
 ifeq ($(VIVANTE_NO_VG),1)
   CFLAGS            += -DVIVANTE_NO_VG
 endif
@@ -322,34 +332,28 @@ ifeq ($(EGL_API_NULLWS),1)
 endif
 
 ifeq ($(EGL_API_FB),1)
-  CFLAGS            += -DEGL_API_FB -DOPENGL40
+  CFLAGS            += -DEGL_API_FB
 endif
 
 ifeq ($(EGL_API_WL),1)
   CFLAGS            += -DEGL_API_WL -DWL_EGL_PLATFORM -Wno-deprecated-declarations
-  ifeq ($(YOCTO_DRI_BUILD),1)
+  ifeq ($(GL4_DRI_BUILD),1)
     CFLAGS            += -DDRI_PIXMAPRENDER_ASYNC
-    CFLAGS            += -DDRI_PIXMAPRENDER_GL
+    CFLAGS            += -DGL4_DRI_BUILD
   endif
 else
   ifeq ($(EGL_API_DRI),1)
-  ifeq ($(YOCTO_DRI_BUILD),1)
-    CFLAGS            += -I$(X11_ARM_DIR)/include/arm-linux-gnueabi
-  endif
   CFLAGS            += -DDRI_PIXMAPRENDER_ASYNC
-  CFLAGS            += -DDRI_PIXMAPRENDER_GL
+  CFLAGS            += -DGL4_DRI_BUILD
   CFLAGS            += -DEGL_API_DRI
-  CFLAGS            += -I$(X11_ARM_DIR)/include
+  CFLAGS            += -I$(ROOTFS)/usr/include
   endif
 
   ifeq ($(X11_DRI3),1)
-  ifeq ($(YOCTO_DRI_BUILD),1)
-    CFLAGS            += -I$(X11_ARM_DIR)/include/arm-linux-gnueabi
-  endif
   CFLAGS            += -DDRI_PIXMAPRENDER_ASYNC
-  CFLAGS            += -DDRI_PIXMAPRENDER_GL
+  CFLAGS            += -DGL4_DRI_BUILD
   CFLAGS            += -DX11_DRI3
-  CFLAGS            += -I$(X11_ARM_DIR)/include
+  CFLAGS            += -I$(ROOTFS)/usr/include
   endif
 endif
 
@@ -359,8 +363,7 @@ endif
 
 ifeq ($(EGL_API_X),1)
   CFLAGS            += -DEGL_API_X
-  CFLAGS            += -I$(X11_ARM_DIR)/include
-  CFLAGS            += -I$(X11_ARM_DIR)/include/arm-linux-gnueabi
+  CFLAGS            += -I$(ROOTFS)/usr/include
 endif
 
 ifeq ($(STATIC_LINK),1)
@@ -426,6 +429,15 @@ else
   CFLAGS            += -DGC_ENABLE_LOADTIME_OPT=0
 endif
 
+ifeq ($(USE_OPENVX),1)
+  CFLAGS            += -DVX_VERSION=VX_VERSION_${OPENVX_MAJOR_VERSION}_${OPENVX_SUB_VERSION}
+ifeq ($(USE_BROKER),1)
+  CFLAGS            += -DgcdUSE_BROKER=1
+  CFLAGS            += -DNO_KERNEL
+  NO_KERNEL         := 1
+endif
+endif
+
 ifeq ($(USE_VXC_BINARY),1)
   CFLAGS            += -DgcdUSE_VXC_BINARY=1
   ifeq ($(GPU_CONFIG),)
@@ -484,15 +496,24 @@ GAL_DIR             := $(AQROOT)/hal
 EGL_DIR             := $(AQROOT)/driver/khronos/libEGL
 GLES11_DIR          := $(AQROOT)/driver/khronos/libGLESv11
 GLES2X_DIR          := $(AQROOT)/driver/khronos/libGLESv3
+GL4X_DIR            := $(AQROOT)/driver/khronos/libGL4
+LIBDRM_DIR          := $(AQROOT)/driver/X/libdrm-2.4.91
 
+CL11_DIR            := $(AQROOT)/driver/khronos/libCL
+CL11_ICD_DIR        := $(AQROOT)/driver/khronos/libCL/icdloader12
+CLC_DIR             := $(AQROOT)/compiler/libCLC
 
 GLSLC_DIR           := $(AQROOT)/compiler/libGLSLC
 VSC_DIR             := $(AQROOT)/compiler/libVSC
 VSC_Lite_DIR        := $(AQROOT)/compiler/libVSC_Lite
 
-VULKAN_DIR          := $(AQROOT)/driver/khronos/libVulkan10
+VULKAN_DIR          := $(AQROOT)/driver/khronos/libVulkan11
 SPIRV_DIR           := $(AQROOT)/compiler/libSPIRV
 
+OPENVX_DIR          := $(AQROOT)/driver/khronos/libOpenVX
+
+VDK_DIR             := $(AQROOT)/sdk/vdk
+VIVANTE_LIB_DIR     := $(AQROOT)/sdk/vivante
 VG113D_DIR          := $(AQROOT)/driver/khronos/libOpenVG_3D/vg11/driver
 VG112D_DIR          := $(AQROOT)/driver/khronos/libOpenVG
 GFX_DIR             := $(AQROOT)/driver/dfb
@@ -502,17 +523,6 @@ EXA_DIR             := $(AQROOT)/driver/X/EXA_G2D/src
 else
 EXA_DIR             := $(AQROOT)/driver/X/EXA/src
 endif
-
-GL4X_DIR            := $(AQROOT)/driver/khronos/libGL4
-
-CL11_DIR            := $(AQROOT)/driver/khronos/libCL
-CL11_ICD_DIR        := $(AQROOT)/driver/khronos/libCL/icdloader12
-CLC_DIR             := $(AQROOT)/compiler/libCLC
-
-OPENVX_DIR          := $(AQROOT)/driver/khronos/libOpenVX
-
-VDK_DIR             := $(AQROOT)/sdk/vdk
-VIVANTE_LIB_DIR     := $(AQROOT)/sdk/vivante
 
 # applications
 EGL_TEST_DIR        := $(AQROOT)/test/egl

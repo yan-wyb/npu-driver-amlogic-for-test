@@ -121,12 +121,13 @@ OBJS += $(HAL_KERNEL_DIR)/gc_hal_kernel.o \
         $(HAL_KERNEL_DIR)/gc_hal_kernel_mmu.o \
         $(HAL_KERNEL_DIR)/gc_hal_kernel_video_memory.o \
         $(HAL_KERNEL_DIR)/gc_hal_kernel_power.o \
-        $(HAL_KERNEL_DIR)/gc_hal_kernel_security_v1.o
+        $(HAL_KERNEL_DIR)/gc_hal_kernel_security_v1.o \
+        $(HAL_KERNEL_DIR)/gc_hal_kernel_preemption.o
 
 OBJS += $(ARCH_KERNEL_DIR)/gc_hal_kernel_context.o \
         $(ARCH_KERNEL_DIR)/gc_hal_kernel_hardware.o \
         $(ARCH_KERNEL_DIR)/gc_hal_kernel_hardware_func.o \
-	$(ARCH_KERNEL_DIR)/gc_hal_kernel_hardware_func_flop_reset.o \
+        $(ARCH_KERNEL_DIR)/gc_hal_kernel_hardware_func_flop_reset.o \
         $(ARCH_KERNEL_DIR)/gc_hal_kernel_hardware_async_fe.o \
         $(ARCH_KERNEL_DIR)/gc_hal_kernel_hardware_mc_fe.o \
         $(ARCH_KERNEL_DIR)/gc_hal_kernel_hardware_waitlink_fe.o
@@ -299,7 +300,7 @@ endif
 
 
 ifeq ($(VIVANTE_ENABLE_DRM),1)
-EXTRA_CFLAGS += -I$(AQROOT)/driver/X/libdrm-2.4.91/include/drm
+EXTRA_CFLAGS += -I$(LIBDRM_DIR)/include/drm
 endif
 
 EXTRA_CFLAGS += -DHOST=\"$(HOST)\"
