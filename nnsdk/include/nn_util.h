@@ -12,6 +12,12 @@
 extern "C" {
 #endif
 
+#define POWER_IDLE          0
+#define POWER_ON            1
+#define POWER_SUSPEND       2
+#define POWER_OFF           3
+#define POWER_RESET         4
+
 typedef struct{
     float x, y;
 } landmark;

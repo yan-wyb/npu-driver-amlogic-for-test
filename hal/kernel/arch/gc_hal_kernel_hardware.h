@@ -233,6 +233,8 @@ struct _gckHARDWARE
 
     gctUINT64                   contextID;
 
+	gctUINT32                   powerTimeout;
+
     gctBOOL                     hasQchannel;
 };
 

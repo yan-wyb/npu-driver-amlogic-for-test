@@ -318,236 +318,151 @@ static ulong bankSize = 0;
 
 static gcsMODULE_PARAMETERS moduleParam;
 
-/*==========================some sysfs functions,device begin================================
-static ssize_t show_control(struct device *device,
-				  struct device_attribute *attr,
-				  char *buf)
-{
-	
-	return snprintf(buf, PAGE_SIZE, "zxw:control read,just for test\n");
-}
-
-static ssize_t store_control(struct device *device,
-				       struct device_attribute *attr,
-				       const char *buf, size_t count)
-{
-	ssize_t ret = 0;
-	printk("zxw:store_control,%s\n",buf);
-	return ret;					   
-}
-static ssize_t show_policy(struct device *device,
-				  struct device_attribute *attr,
-				  char *buf)
-{
-	ssize_t ret = 0;
-
-	return ret;
-}
-
-static ssize_t store_policy(struct device *device,
-				       struct device_attribute *attr,
-				       const char *buf, size_t count)
-{
-	ssize_t ret = 0;
-
-	return ret;					   
-}
-static ssize_t show_status(struct device *device,
-				  struct device_attribute *attr,
-				  char *buf)
-{
-	ssize_t ret = 0;
-
-	return ret;
-}
-
-static ssize_t store_status(struct device *device,
-				       struct device_attribute *attr,
-				       const char *buf, size_t count)
-{
-	ssize_t ret = 0;
-
-	return ret;					   
-}
-static ssize_t show_info(struct device *device,
-				  struct device_attribute *attr,
-				  char *buf)
-{
-	ssize_t ret = 0;
-
-	return ret;
-}
-
-static ssize_t store_info(struct device *device,
-				       struct device_attribute *attr,
-				       const char *buf, size_t count)
-{
-	ssize_t ret = 0;
-
-	return ret;					   
-}
-//device_attribute
-static struct device_attribute gal_attrs[] = {
-	__ATTR(control, 0664,
-			show_control, store_control),
-	__ATTR(policy, 0664,
-			show_policy, store_policy),
-	__ATTR(status, 0664,
-			show_status, store_status),
-	__ATTR(info, 0664,
-			show_info, store_info),
-};
-=========================some sysfs functions,device end==================================*/
-
 /*==========================some sysfs functions,class begin===================================*/
-static ssize_t show_class_control(struct class *class,
-		        struct class_attribute *attr, char *buf)
+static ssize_t show_class_control(struct class *class,struct class_attribute *attr, char *buf)
 {
-	gctUINT32 status = 0;
-	if(platform->ops->getPowerStatus)
-	{
-		platform->ops->getPowerStatus(platform,&status);
-	}
-	return snprintf(buf, PAGE_SIZE, "status:%d,\n",status);
+    gctUINT32 status = 0;
+    if (platform->ops->getPowerStatus)
+    {
+        platform->ops->getPowerStatus(platform,&status);
+    }
+    return snprintf(buf, PAGE_SIZE, "customid:%d,status:%d\n",galDevice->kernels[0]->hardware->identity.customerID,status);
 }
 /*============the control format should as: (control-domain:control-value)==========*/
 static int kcmp(const char *buff,const char *token,int lenth)
 {
-	int i = 0;
-	int flag = 0;
-	for(i=0;i<lenth;i++)
-	{
-		if(buff[i] != token[i])
-		{
-			flag = 1;
-			break;
-		}
-	}
-	return flag;
+    int i = 0;
+    int flag = 0;
+    for (i=0;i<lenth;i++)
+    {
+        if (buff[i] != token[i])
+        {
+            flag = 1;
+            break;
+        }
+    }
+    return flag;
 }
 static int findtok(const char *buff,const char token,int lenth)
 {
-	int pos = 0;
-	int i = 0;
-	for(i=0;i<lenth;i++)
-	{
-		if(buff[i] == token)
-		{
-			pos = i;
-			break;
-		}
-	}
-	return pos;
+    int pos = 0;
+    int i = 0;
+    for (i=0;i<lenth;i++)
+    {
+        if (buff[i] == token)
+        {
+            pos = i;
+            break;
+        }
+    }
+    return pos;
 }
-static ssize_t store_class_control(struct class *class,
-		struct class_attribute *attr, const char *buf, size_t count)
+static ssize_t store_class_control(struct class *class,struct class_attribute *attr, const char *buf, size_t count)
 {
-	gctUINT32 status = 0;
-	int pos = 0;
-	//printk("zxw:store_control,%s\n",buf);
-	pos = findtok(buf,':',strlen(buf));
-	if(pos == 0)
-	{
-		return count;
-	}
-	//printk("pos:%d,val:%c\n",pos,buf[pos+1]);
-	//ret = kstrtoint(&buf[pos+1], 0, &val);
-	if(kcmp(buf,"profile",strlen("profile")) == 0)
-	{
-		printk("the control domain is profile\n");
-		if(platform->ops->getPowerStatus)
-		{
-			platform->ops->getPowerStatus(platform,&status);
-		}
-		if(status != POWER_ON)
-		{
-			gckOS_SetGPUPower(galDevice->os, 0, 1, 1);
-			//platform->ops->getPower(platform);
-		}
-		if(buf[pos+1] == '1')
-		{
-			galDevice->args.gpuProfiler = 1;
-			gckHARDWARE_SetGpuProfiler(galDevice->kernels[0]->hardware, 1);
-		}
-		else
-		{
-			galDevice->args.gpuProfiler = 0;
-			gckHARDWARE_SetGpuProfiler(galDevice->kernels[0]->hardware, 0);
-		}
-	}
-	else if(kcmp(buf,"policy",strlen("policy")) == 0)
-	{
-		printk("the control domain is policy\n");
-		if(platform->ops->setPolicy)
-		{
-			platform->ops->setPolicy(platform,(gctUINT32)(buf[pos+1]-'0'));
-		}
-	}
-	return count;					   
+    gctUINT32 status = 0;
+    int pos = 0;
+    int val = 0;
+    pos = findtok(buf,':',strlen(buf));
+    if (pos == 0)
+    {
+        return count;
+    }
+
+    if (kcmp(buf,"profile",strlen("profile")) == 0)
+    {
+        printk("the control domain is profile\n");
+        if (platform->ops->getPowerStatus)
+        {
+            platform->ops->getPowerStatus(platform,&status);
+        }
+        if (status != POWER_ON)
+        {
+            gckOS_SetGPUPower(galDevice->os, 0, 1, 1);
+        }
+        if (buf[pos+1] == '1')
+        {
+            galDevice->args.gpuProfiler = 1;
+            gckHARDWARE_SetGpuProfiler(galDevice->kernels[0]->hardware, 1);
+        }
+        else
+        {
+            galDevice->args.gpuProfiler = 0;
+            gckHARDWARE_SetGpuProfiler(galDevice->kernels[0]->hardware, 0);
+        }
+    }
+    else if (kcmp(buf,"policy",strlen("policy")) == 0)
+    {
+        printk("the control domain is policy\n");
+        if (platform->ops->setPolicy)
+        {
+            platform->ops->setPolicy(platform,(gctUINT32)(buf[pos+1]-'0'));
+        }
+    }
+    else if (kcmp(buf,"suspend",strlen("suspend")) == 0)
+    {
+        if (kstrtoint(&buf[pos+1], 0, &val) != 0)
+        {
+            printk("kstrtoint return error\n");
+            val = 300;
+        }
+        printk("the control domain is suspend,value is %d\n",val);
+        galDevice->kernels[0]->hardware->powerTimeout = val;
+    }
+    return count;
 }
 
-static ssize_t show_class_policy(struct class *class,
-		        struct class_attribute *attr, char *buf)
+static ssize_t show_class_policy(struct class *class,struct class_attribute *attr, char *buf)
 {
-	
-	return snprintf(buf, PAGE_SIZE, "policy read,just for test\n");
+    return snprintf(buf, PAGE_SIZE, "policy read,just for test\n");
 }
 
-static ssize_t store_class_policy(struct class *class,
-		struct class_attribute *attr, const char *buf, size_t count)
+static ssize_t store_class_policy(struct class *class,struct class_attribute *attr, const char *buf, size_t count)
 {
-	ssize_t ret = 0;
-	printk("store_policy,%s\n",buf);
-	return ret;					   
+    ssize_t ret = 0;
+    printk("store_policy,%s\n",buf);
+    return ret;
 }
 
-static ssize_t show_class_status(struct class *class,
-		        struct class_attribute *attr, char *buf)
+static ssize_t show_class_status(struct class *class,struct class_attribute *attr, char *buf)
 {
-	gctUINT32 status = 0;
-	if(platform->ops->getPowerStatus)
-	{
-		platform->ops->getPowerStatus(platform,&status);
-	}
-	return snprintf(buf, PAGE_SIZE, "status:%d",status);
+    gctUINT32 status = 0;
+    if (platform->ops->getPowerStatus)
+    {
+        platform->ops->getPowerStatus(platform,&status);
+    }
+    return snprintf(buf, PAGE_SIZE, "status:%d",status);
 }
 
-static ssize_t store_class_status(struct class *class,
-		struct class_attribute *attr, const char *buf, size_t count)
+static ssize_t store_class_status(struct class *class,struct class_attribute *attr, const char *buf, size_t count)
 {
-	ssize_t ret = 0;
-	printk("store_status,%s\n",buf);
-	return ret;					   
+    ssize_t ret = 0;
+    printk("store_status,%s\n",buf);
+    return ret;
 }
 
-static ssize_t show_class_info(struct class *class,
-		        struct class_attribute *attr, char *buf)
+static ssize_t show_class_info(struct class *class,struct class_attribute *attr, char *buf)
 {
-	
-	return snprintf(buf, PAGE_SIZE, "info read,just for test\n");
+    return snprintf(buf, PAGE_SIZE, "info read,just for test\n");
 }
 
-static ssize_t store_class_info(struct class *class,
-		struct class_attribute *attr, const char *buf, size_t count)
+static ssize_t store_class_info(struct class *class,struct class_attribute *attr, const char *buf, size_t count)
 {
-	ssize_t ret = 0;
-	printk("store_info,%s\n",buf);
-	return ret;					   
+    ssize_t ret = 0;
+    printk("store_info,%s\n",buf);
+    return ret;
 }
 
 static struct class_attribute gal_class_attrs[] = {
-	__ATTR(control, 0664,
-			show_class_control, store_class_control),
-	__ATTR(policy, 0664,
-			show_class_policy, store_class_policy),
-	__ATTR(status, 0664,
-			show_class_status, store_class_status),
-	__ATTR(info, 0664,
-			show_class_info, store_class_info),
+    __ATTR(control, 0664,
+            show_class_control, store_class_control),
+    __ATTR(policy, 0664,
+            show_class_policy, store_class_policy),
+    __ATTR(status, 0664,
+            show_class_status, store_class_status),
+    __ATTR(info, 0664,
+            show_class_info, store_class_info),
 };
 /*=========================some sysfs functions,class end=======================================*/
-
-
 static void
 _InitModuleParam(
     gcsMODULE_PARAMETERS * ModuleParam

@@ -533,6 +533,8 @@ int  aml_util_flushTensorHandle(void* context,aml_flush_type_t type);
 void process_top5(float *buf,unsigned int num,img_classify_out_t* clsout);
 int  aml_util_setProfile(aml_profile_type_t type,const char *savepath); /*===set profile type===*/
 int  aml_util_setPowerPolicy(aml_policy_type_t type); /*===set power policy===*/
+int  aml_util_getHardwareStatus(int *customID,int *powerStatus); /*===get hardware info===*/
+int  aml_util_setAutoSuspend(int timeout);  /*===get hardware info===*/
 #ifdef __cplusplus
 } //extern "C"
 #endif
