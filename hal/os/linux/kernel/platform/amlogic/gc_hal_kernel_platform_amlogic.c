@@ -400,7 +400,7 @@ gceSTATUS _GetPower(IN gcsPLATFORM *Platform)
     switch (nn_power_version)
     {
         case 1:
-            nanoqFreq=666*1000*1000;
+            nanoqFreq=666*1024*1024;
             Getpower_a1(pdev);
             break;
         case 2:
@@ -410,7 +410,7 @@ gceSTATUS _GetPower(IN gcsPLATFORM *Platform)
             Getpower_99(pdev);
             break;
         case 4:
-            nanoqFreq=666*1000*1000;
+            nanoqFreq=666*1024*1024;
             Getpower_be(pdev);
             break;
         default:
@@ -548,7 +548,7 @@ gceSTATUS _SetPolicy(IN gcsPLATFORM *Platform,IN gctUINT32  powerLevel)
     switch (nn_power_version)
     {
         case 1:
-            nanoqFreq=666*1000*1000;
+            nanoqFreq=666*1024*1024;
             break;
         case 2:
             nanoqFreq=800000000;
@@ -557,7 +557,7 @@ gceSTATUS _SetPolicy(IN gcsPLATFORM *Platform,IN gctUINT32  powerLevel)
             nanoqFreq=800000000;
             break;
         case 4:
-            nanoqFreq=666*1000*1000;
+            nanoqFreq=666*1024*1024;
             break;
         default:
             nanoqFreq=800000000;
