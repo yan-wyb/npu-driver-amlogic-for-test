@@ -294,7 +294,7 @@ void Getpower_88(struct platform_device *pdev)
 void Getpower_99(struct platform_device *pdev)
 {
 #if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 10, 0))
-    power_domain_switch(NN_PD_0X99,0);
+    power_domain_switch(NN_PD_0X99,PWR_ON);
 #endif
 
     set_clock(pdev);
@@ -332,7 +332,7 @@ void Downpower_99(void)
 {
 
 #if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 10, 0))
-    power_domain_switch(NN_PD_0X99,1);
+    power_domain_switch(NN_PD_0X99,PWR_OFF);
 #endif
 
 }
