@@ -3442,7 +3442,7 @@ static gcsFEATURE_DATABASE gChipInfo[] = {
         0x10, /* gcFEATURE_VALUE_TPEngine_PwlLUTSize */
         0x100000, /* gcFEATURE_VALUE_VIP_SRAM_SIZE */
         0x3, /* gcFEATURE_VALUE_TPEngine_CoreCount */
-        0x40000, /* gcFEATURE_VALUE_AXI_SRAM_SIZE */
+        0x20000, /* gcFEATURE_VALUE_AXI_SRAM_SIZE */
         0x5, /* gcFEATURE_VALUE_NN_INIMAGE_OFFSET_BITS */
         0x200, /* gcFEATURE_VALUE_TP_REORDER_INIMAGE_SIZE */
         0x0, /* gcFEATURE_VALUE_TPLite_CoreCount */
