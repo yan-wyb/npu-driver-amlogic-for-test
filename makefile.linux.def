@@ -40,6 +40,7 @@ VIVANTE_ENABLE_VG   ?= 0
 VIVANTE_ENABLE_3D   ?= 1
 VIVANTE_NO_GL4      ?= 0
 VIVANTE_NO_VG       ?= 0
+VIVANTE_ENABLE_APBFE   ?= 0
 
 LINUX_EMULATOR      ?= 0
 LINUX_VSIMULATOR    ?= 0
@@ -95,7 +96,7 @@ ifeq ($(VIVANTE_ENABLE_3D),1)
     BUILD_OPENCL_ICD:= 0
     else
     ENABLE_CL_GL    ?= 0
-    BUILD_OPENCL_ICD:= 1
+    BUILD_OPENCL_ICD:= 0
     endif
   else
     ENABLE_CL_GL    ?= 0
@@ -117,7 +118,7 @@ endif
 
 ifeq ($(USE_OPENVX),1)
    OPENVX_MAJOR_VERSION ?= 1
-   OPENVX_SUB_VERSION ?= 2
+   OPENVX_SUB_VERSION ?= 3
 endif
 
 ifneq ($(LINUX_OABI),1)
@@ -346,14 +347,18 @@ else
   CFLAGS            += -DDRI_PIXMAPRENDER_ASYNC
   CFLAGS            += -DGL4_DRI_BUILD
   CFLAGS            += -DEGL_API_DRI
-  CFLAGS            += -I$(ROOTFS)/usr/include
+  ifneq ($(ROOTFS),)
+    CFLAGS            += -I$(ROOTFS)/usr/include
+  endif
   endif
 
   ifeq ($(X11_DRI3),1)
   CFLAGS            += -DDRI_PIXMAPRENDER_ASYNC
   CFLAGS            += -DGL4_DRI_BUILD
   CFLAGS            += -DX11_DRI3
-  CFLAGS            += -I$(ROOTFS)/usr/include
+  ifneq ($(ROOTFS),)
+    CFLAGS            += -I$(ROOTFS)/usr/include
+  endif
   endif
 endif
 
@@ -363,7 +368,9 @@ endif
 
 ifeq ($(EGL_API_X),1)
   CFLAGS            += -DEGL_API_X
-  CFLAGS            += -I$(ROOTFS)/usr/include
+  ifneq ($(ROOTFS),)
+    CFLAGS            += -I$(ROOTFS)/usr/include
+  endif
 endif
 
 ifeq ($(STATIC_LINK),1)
@@ -490,6 +497,9 @@ endif
 
 ################################################################################
 # Module directories.
+
+#CARCH
+CARCHDIR            := $(AQROOT)/arch/vipArchPerfMdl_dev/
 
 # drivers
 GAL_DIR             := $(AQROOT)/hal

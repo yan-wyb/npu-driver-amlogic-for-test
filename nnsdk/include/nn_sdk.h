@@ -151,6 +151,7 @@ typedef enum {
     FACE_NET            = 22,
     FACE_RECOG_U        = 23,
     FACE_RFB_DETECTION  = 24,
+    AML_PERSON_DETECT   = 25,
     CUSTOM_NETWORK      = 99,   ///< custom network, for user development
     MODEL_MAX           = 100    ///< max model number
 } aml_module_t;
@@ -160,6 +161,13 @@ typedef enum {
     AML_OUTDATA_RAW          = 1,
     AML_OUTDATA_DMA          = 2
 } aml_output_format_t;
+
+typedef enum {
+    AML_NO_PERF            = 0,
+    AML_PERF_INFERRENCE    = 1,
+    AML_PERF_OUTPUT        = 2
+} aml_perf_mode_t;
+
 typedef enum {
     AML_PROFILE_NONE         = 0,
     AML_PROFILE_PERFORMANCE  = 1,
@@ -173,10 +181,16 @@ typedef enum {
     AML_MINIMUM_POWER_MODE       = 3
 } aml_policy_type_t;
 
+typedef enum {
+    AML_IO_VIRTUAL      = 0,
+    AML_IO_PHYS         = 1,
+} aml_io_format_t;
+
 typedef  struct __amlnn_module_out_data_t
 {
     int typeSize;
     aml_module_t mdType;
+    aml_perf_mode_t perfMode;
     aml_output_format_t format;
 } aml_output_config_t;
 
@@ -199,6 +213,14 @@ typedef struct _nn_buffer_create_params_t
      quant_data; /*<! \brief The union of quantization information */
 } nn_buffer_params_t;
 
+
+typedef enum {
+    AML_INPUT_DEFAULT   = 0,    //channle format: caffe 2 1 0 ,others 0 1 2
+    AML_INPUT_MODEL_1   = 1,    //channle format: 0 1 2
+    AML_INPUT_MODEL_2   = 2,    //channle format: 2 1 0
+} aml_input_format_t;
+
+
 typedef struct out_buf
 {
     unsigned int size;
@@ -220,6 +242,7 @@ typedef struct
     int valid;
     float mean[INPUT_CNANNEL];
     float scale;
+    aml_input_format_t input_format;
 }input_info;
 
 typedef struct __nn_input
@@ -234,6 +257,7 @@ typedef struct __nn_input
 
 typedef struct __assign_address
 {
+    aml_io_format_t io_type;
     unsigned char* inAddr[ADDRESS_MAX_NUM];
     unsigned char* outAddr[ADDRESS_MAX_NUM];
 }assign_user_address_t;
@@ -290,6 +314,7 @@ unsigned char * aml_util_mallocAlignedBuffer(int mem_size);  /*======malloc 4k a
 void aml_util_freeAlignedBuffer(unsigned char *addr);        /*======free buffer alloced by above=========*/
 /*==swap input buffer,the inputId(for multi-number input)is ordered as amlnn_get_input_tensor_info array==*/
 int aml_util_swapInputBuffer(void *context,void *newBuffer,unsigned int inputId);
+int aml_util_swapOutputBuffer(void *context,void *newBuffer,unsigned int outputId);
 tensor_info* aml_util_getInputTensorInfo(const char* nbgdata);  /*====get model input tensor information list=====*/
 tensor_info* aml_util_getOutputTensorInfo(const char* nbgdata); /*====get model output tensor information list====*/
 void aml_util_freeTensorInfo(tensor_info* tinfo);     /*====free the tensor_info memory get by above two functions*/

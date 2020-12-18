@@ -78,6 +78,8 @@ typedef enum
     VSI_NN_QNT_TYPE_AFFINE_ASYMMETRIC = VX_QUANT_AFFINE_SCALE,
     /** affine perchannel symmetric */
     VSI_NN_QNT_TYPE_AFFINE_PERCHANNEL_SYMMETRIC = 0x3,/*VX_QUANT_AFFINE_SCALE_PER_CHANNEL*/
+    /** affine symmetric */
+    VSI_NN_QNT_TYPE_AFFINE_SYMMETRIC = VX_QUANT_AFFINE_SCALE,
     /** undefined type */
     VSI_NN_QNT_TYPE_NA = 0xff,
 } vsi_nn_qnt_type_e;
@@ -143,6 +145,9 @@ typedef struct vsi_nn_tensor_attr
     vsi_nn_dtype_t dtype;
     vsi_bool     is_created_from_handle;
     vsi_bool     is_handle_malloc_by_ovxlib;
+#ifdef VX_CREATE_TENSOR_SUPPORT_PHYSICAL
+    vsi_memory_type_e vsi_memory_type;
+#endif
 } vsi_nn_tensor_attr_t;
 
 

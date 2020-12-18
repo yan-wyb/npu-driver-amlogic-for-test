@@ -283,6 +283,8 @@ float sigmod(float x);
 unsigned char *transpose(const unsigned char * src,int width,int height);
 void process_top5(float *buf,unsigned int num,img_classify_out_t* clsout);
 void *post_process_all_module(aml_module_t type,nn_output *pOut);
+int max_index(float *a, int n);
+box get_region_box(float *x, float *biases, int n, int index, int i, int j, int w, int h);
 
 #ifdef __cplusplus
 } //extern "C"

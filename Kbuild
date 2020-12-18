@@ -176,6 +176,7 @@ clean:
 	@rm -rf $(OBJS)
 	@rm -rf modules.order Module.symvers .tmp_versions
 	@find $(AQROOT) -name ".gc_*.cmd" | xargs rm -f
+	@rm -f $(MODULE_NAME).ko $(MODULE_NAME).o $(MODULE_NAME).mod.[co] .galcore.*.cmd
 
 install: all
 	@mkdir -p $(SDK_DIR)/drivers
@@ -272,15 +273,7 @@ EXTRA_CFLAGS += -DgcdSECURITY=1
 endif
 
 ifneq ($(CONFIG_DRM),)
-    ifneq ($(CONFIG_ANDROID),)
-        ifeq ($(VIVANTE_ENABLE_DRM),1)
-        EXTRA_CFLAGS += -DgcdENABLE_DRM=1
-        else
-        EXTRA_CFLAGS += -DgcdENABLE_DRM=0
-        endif
-    else
-    EXTRA_CFLAGS += -DgcdENABLE_DRM=0
-    endif
+EXTRA_CFLAGS += -DgcdENABLE_DRM=$(VIVANTE_ENABLE_DRM)
 else
 EXTRA_CFLAGS += -DgcdENABLE_DRM=0
 endif
@@ -298,10 +291,6 @@ ifneq ($(CONFIG_ARM),)
 EXTRA_CFLAGS += -Iarch/arm/mm
 endif
 
-
-ifeq ($(VIVANTE_ENABLE_DRM),1)
-EXTRA_CFLAGS += -I$(LIBDRM_DIR)/include/drm
-endif
 
 EXTRA_CFLAGS += -DHOST=\"$(HOST)\"
 
