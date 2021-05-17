@@ -3289,13 +3289,25 @@ gckMMU_SetupSRAM(
                (Device->extSRAMBases[i] != gcvINVALID_PHYSICAL_ADDRESS))
             {
 
-                Device->extSRAMBaseAddresses[i] = 0;
-
                 gcmkONERROR(gckOS_CPUPhysicalToGPUPhysical(
                     Mmu->os,
                     Device->extSRAMBases[i],
                     &Device->extSRAMGPUBases[i]
                     ));
+
+                if ((Device->extSRAMGPUBases[i] + Device->extSRAMSizes[i] - 1 <= gcvINVALID_ADDRESS)
+                    && (Device->extSRAMGPUBases[i] + Device->extSRAMSizes[i] * 2 > gcvINVALID_ADDRESS))
+                {
+                    Device->extSRAMBaseAddresses[i] = 0xFFFF000 - Device->extSRAMSizes[i] * 2;
+                    if (Device->extSRAMBaseAddresses[i] < 0x1000000)
+                    {
+                        gcmkONERROR(gcvSTATUS_OUT_OF_RESOURCES);
+                    }
+                }
+                else
+                {
+                    Device->extSRAMBaseAddresses[i] = 0;
+                }
 
                 gcmkONERROR(_FillFlatMapping(
                     Mmu,
