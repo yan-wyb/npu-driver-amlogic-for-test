@@ -227,6 +227,7 @@ typedef struct out_buf
     unsigned char *buf;
     nn_buffer_params_t *param;
     char  name[MAX_NAME_LEGTH];     //output tensor name
+    aml_output_format_t out_format;
 }outBuf_t;
 
 typedef struct __nnout

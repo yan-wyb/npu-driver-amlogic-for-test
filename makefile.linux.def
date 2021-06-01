@@ -1,6 +1,6 @@
 ##############################################################################
 #
-#    Copyright (c) 2005 - 2020 by Vivante Corp.  All rights reserved.
+#    Copyright (c) 2005 - 2021 by Vivante Corp.  All rights reserved.
 #
 #    The material in this file is confidential and contains trade secrets
 #    of Vivante Corporation. This is proprietary information owned by
@@ -48,6 +48,7 @@ NO_KERNEL           ?= 0
 
 USE_OPENCL          ?= 1
 USE_OPENVX          ?= 1
+USE_VIP_ONLY        ?= 0
 USE_OVXLIB          ?= 0
 USE_VULKAN          ?= 0
 USE_VDK             ?= 0
@@ -83,6 +84,8 @@ USE_VSC_LITE        ?= 0
 
 USE_STATIC_STDCxx   ?= 0
 
+USE_CLANG           ?= 0
+
 #If need to user ori arch model, set to 1
 ORI_NNARCHPERF   ?= 0
 
@@ -92,6 +95,9 @@ ORI_NNARCHPERF   ?= 0
 ifeq ($(VIVANTE_ENABLE_3D),1)
   ifeq ($(USE_OPENCL),1)
     ifeq ($(LINUX_VSIMULATOR),1)
+    ENABLE_CL_GL    ?= 0
+    BUILD_OPENCL_ICD:= 0
+    else ifeq ($(USE_VIP_ONLY),1)
     ENABLE_CL_GL    ?= 0
     BUILD_OPENCL_ICD:= 0
     else
@@ -215,6 +221,9 @@ CONFIG_DOVE_GPU     := 0
 ###############################################################
 # Common flags.
 LDFLAGS += $(LFLAGS)
+ifneq ($(ROOTFS),)
+LDFLAGS += --sysroot=$(ROOTFS)
+endif
 
 ifneq (,$(findstring -mcpu=,$(CC) $(CFLAGS)))
 CPU_TYPE=0
@@ -274,7 +283,7 @@ endif
 
 ifeq ($(DEBUG),1)
 # CFLAGS            += -g3 -ggdb3 -O0 -DDEBUG -D_DEBUG -DgcdDEBUG=1
-  CFLAGS            += -g -O0 -DDEBUG -D_DEBUG -DgcdDEBUG=1
+  CFLAGS            += -g -O1 -DDEBUG -D_DEBUG -DgcdDEBUG=1
 else
   ifeq ("$(DEBUG)", "valgrind")
     CFLAGS          += -g -O -DgcdBUILT_FOR_VALGRIND=1

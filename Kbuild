@@ -2,7 +2,7 @@
 #
 #    The MIT License (MIT)
 #
-#    Copyright (c) 2014 - 2020 Vivante Corporation
+#    Copyright (c) 2014 - 2021 Vivante Corporation
 #
 #    Permission is hereby granted, free of charge, to any person obtaining a
 #    copy of this software and associated documentation files (the "Software"),
@@ -26,7 +26,7 @@
 #
 #    The GPL License (GPL)
 #
-#    Copyright (C) 2014 - 2020 Vivante Corporation
+#    Copyright (C) 2014 - 2021 Vivante Corporation
 #
 #    This program is free software; you can redistribute it and/or
 #    modify it under the terms of the GNU General Public License
@@ -89,6 +89,8 @@ OBJS := $(OS_KERNEL_DIR)/gc_hal_kernel_device.o \
         $(OS_KERNEL_DIR)/gc_hal_kernel_linux.o \
         $(OS_KERNEL_DIR)/gc_hal_kernel_math.o \
         $(OS_KERNEL_DIR)/gc_hal_kernel_os.o \
+        $(OS_KERNEL_DIR)/gc_hal_kernel_iommu.o \
+        $(OS_KERNEL_DIR)/gc_hal_kernel_debug.o \
         $(OS_KERNEL_DIR)/gc_hal_kernel_debugfs.o \
         $(OS_KERNEL_DIR)/gc_hal_kernel_allocator.o \
         $(OS_KERNEL_DIR)/allocator/default/gc_hal_kernel_allocator_user_memory.o \
@@ -104,10 +106,6 @@ ifneq ($(CONFIG_DMA_SHARED_BUFFER),)
 OBJS += $(OS_KERNEL_DIR)/allocator/default/gc_hal_kernel_allocator_dmabuf.o
 endif
 
-ifneq ($(CONFIG_IOMMU_SUPPORT),)
-OBJS += $(OS_KERNEL_DIR)/gc_hal_kernel_iommu.o
-endif
-
 ifneq ($(CONFIG_DRM),)
 OBJS += $(OS_KERNEL_DIR)/gc_hal_kernel_drm.o
 endif
@@ -115,7 +113,6 @@ endif
 OBJS += $(HAL_KERNEL_DIR)/gc_hal_kernel.o \
         $(HAL_KERNEL_DIR)/gc_hal_kernel_command.o \
         $(HAL_KERNEL_DIR)/gc_hal_kernel_db.o \
-        $(HAL_KERNEL_DIR)/gc_hal_kernel_debug.o \
         $(HAL_KERNEL_DIR)/gc_hal_kernel_event.o \
         $(HAL_KERNEL_DIR)/gc_hal_kernel_heap.o \
         $(HAL_KERNEL_DIR)/gc_hal_kernel_mmu.o \

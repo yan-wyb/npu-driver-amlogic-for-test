@@ -414,6 +414,10 @@ gceSTATUS _GetPower(IN gcsPLATFORM *Platform)
             nanoqFreq=666*1024*1024;
             Getpower_be(pdev);
             break;
+        case 5:
+            nanoqFreq=852*1024*1024;
+            Getpower_be(pdev);
+            break;
         default:
             printk("not find power_version\n");
     }
@@ -440,6 +444,9 @@ gceSTATUS  _SetPower(IN gcsPLATFORM * Platform,IN gceCORE GPU,IN gctBOOL Enable)
             case 4:
                 Runtime_downpower_be(pdev);
                 break;
+            case 5:
+                Runtime_downpower_be(pdev);
+                break;
             default:
                 printk("not find power_version\n");
                 break;
@@ -460,6 +467,9 @@ gceSTATUS  _SetPower(IN gcsPLATFORM * Platform,IN gceCORE GPU,IN gctBOOL Enable)
                 Runtime_getpower_99(pdev);
                 break;
             case 4:
+                Runtime_getpower_be(pdev);
+                break;
+            case 5:
                 Runtime_getpower_be(pdev);
                 break;
             default:
@@ -497,6 +507,11 @@ gceSTATUS _Reset(IN gcsPLATFORM * Platform, IN gceCORE GPU)
             mdelay(10);
             Runtime_getpower_be(pdev);
             break;
+        case 5:
+            Runtime_downpower_be(pdev);
+            mdelay(10);
+            Runtime_getpower_be(pdev);
+            break;
         default:
             printk("not find power_version\n");
             break;
@@ -527,6 +542,9 @@ gceSTATUS _DownPower(IN gcsPLATFORM *Platform)
             Downpower_99();
             break;
         case 4:
+            Downpower_be();
+            break;
+        case 5:
             Downpower_be();
             break;
         default:
@@ -560,6 +578,9 @@ gceSTATUS _SetPolicy(IN gcsPLATFORM *Platform,IN gctUINT32  powerLevel)
             break;
         case 4:
             nanoqFreq=666*1024*1024;
+            break;
+        case 5:
+            nanoqFreq=852*1024*1024;
             break;
         default:
             nanoqFreq=800000000;
