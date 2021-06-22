@@ -244,6 +244,7 @@ typedef struct
     float mean[INPUT_CNANNEL];
     float scale;
     aml_input_format_t input_format;
+    int int16_type ;
 }input_info;
 
 typedef struct __nn_input
@@ -316,6 +317,8 @@ void aml_util_freeAlignedBuffer(unsigned char *addr);        /*======free buffer
 /*==swap input buffer,the inputId(for multi-number input)is ordered as amlnn_get_input_tensor_info array==*/
 int aml_util_swapInputBuffer(void *context,void *newBuffer,unsigned int inputId);
 int aml_util_swapOutputBuffer(void *context,void *newBuffer,unsigned int outputId);
+int aml_util_switchInputBuffer(void *context,void *newBuffer,unsigned int inputId);
+int aml_util_switchOutputBuffer(void *context,void *newBuffer,unsigned int outputId);
 tensor_info* aml_util_getInputTensorInfo(const char* nbgdata);  /*====get model input tensor information list=====*/
 tensor_info* aml_util_getOutputTensorInfo(const char* nbgdata); /*====get model output tensor information list====*/
 void aml_util_freeTensorInfo(tensor_info* tinfo);     /*====free the tensor_info memory get by above two functions*/
