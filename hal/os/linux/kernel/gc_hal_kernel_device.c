@@ -757,7 +757,7 @@ gc_version_show(void *m, void *data)
         return -ENXIO;
 
 #ifdef CONFIG_DEBUG_FS
-    len = fs_printf(ptr, "%s built at %s\n",  gcvVERSION_STRING, HOST);
+    len = fs_printf(ptr, "version: %s \n",  gcvVERSION_STRING);
 
     if (platform->name)
     {
