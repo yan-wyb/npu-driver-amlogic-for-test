@@ -337,7 +337,7 @@ void aml_util_freeTensorInfo(tensor_info* tinfo);     /*====free the tensor_info
 /*===========get hardinfo from drivers and set profile=======================*/
 int  aml_util_setProfile(aml_profile_type_t type,const char *savepath); /*===set profile type===*/
 int  aml_util_setPowerPolicy(aml_policy_type_t type); /*===set power policy===*/
-int  aml_util_getHardwareStatus(int *customID,int *powerStatus); /*===get hardware info===*/
+int  aml_util_getHardwareStatus(int* customID,int *powerStatus,int* version); /*===get hardware info===*/
 int  aml_util_setAutoSuspend(int timeout);  /*===get hardware info===*/
 int aml_get_hardware_type(void);
 

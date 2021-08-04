@@ -388,7 +388,8 @@ static ssize_t show_class_control(struct class *class,
 	{
 		platform->ops->getPowerStatus(platform,&status);
 	}
-	return snprintf(buf, PAGE_SIZE, "customid:%d,status:%d\n",galDevice->kernels[0]->hardware->identity.customerID,status);
+
+	return snprintf(buf, PAGE_SIZE, "customid:%d,status:%d,ddk_version:%s\n",galDevice->kernels[0]->hardware->identity.customerID,status,gcvVERSION_STRING);
 }
 /*============the control format should as: (control-domain:control-value)==========*/
 
