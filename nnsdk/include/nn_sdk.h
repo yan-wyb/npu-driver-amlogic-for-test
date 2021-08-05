@@ -297,6 +297,16 @@ typedef enum {
     AML_INPUT_TENSOR      = 0,
     AML_OUTPUT_TENSOR     = 1,
 } aml_flush_type_t;
+
+typedef enum {
+    AML_HARDWARE_VSI_UNIFY           = 0,
+    AML_HARDWARE_VIPLITE             = 1,
+    AML_HARDWARE_ADLA                = 2,
+    AML_HARDWARE_AMAZON              = 3,
+
+    AML_HARDWARE_INVALID             = 100,
+} aml_hw_type_t;
+
 //////////////////////////////////////////////////////////
 
 
@@ -314,6 +324,8 @@ int aml_module_destroy(void* context);      /*=====destroy network environment,f
 ==============================================================*/
 unsigned char * aml_util_mallocAlignedBuffer(int mem_size);  /*======malloc 4k align buffer for dma IO====*/
 void aml_util_freeAlignedBuffer(unsigned char *addr);        /*======free buffer alloced by above=========*/
+/*===========flush tensor cache memory=======================*/
+int  aml_util_flushTensorHandle(void* context,aml_flush_type_t type);
 /*==swap input buffer,the inputId(for multi-number input)is ordered as amlnn_get_input_tensor_info array==*/
 int aml_util_swapInputBuffer(void *context,void *newBuffer,unsigned int inputId);
 int aml_util_swapOutputBuffer(void *context,void *newBuffer,unsigned int outputId);
@@ -322,12 +334,12 @@ int aml_util_switchOutputBuffer(void *context,void *newBuffer,unsigned int outpu
 tensor_info* aml_util_getInputTensorInfo(const char* nbgdata);  /*====get model input tensor information list=====*/
 tensor_info* aml_util_getOutputTensorInfo(const char* nbgdata); /*====get model output tensor information list====*/
 void aml_util_freeTensorInfo(tensor_info* tinfo);     /*====free the tensor_info memory get by above two functions*/
-/*===========flush tensor cache memory=======================*/
-int  aml_util_flushTensorHandle(void* context,aml_flush_type_t type);
+/*===========get hardinfo from drivers and set profile=======================*/
 int  aml_util_setProfile(aml_profile_type_t type,const char *savepath); /*===set profile type===*/
 int  aml_util_setPowerPolicy(aml_policy_type_t type); /*===set power policy===*/
 int  aml_util_getHardwareStatus(int *customID,int *powerStatus); /*===get hardware info===*/
 int  aml_util_setAutoSuspend(int timeout);  /*===get hardware info===*/
+int aml_get_hardware_type(void);
 
 #ifdef __cplusplus
 } //extern "C"
