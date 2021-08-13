@@ -12,8 +12,11 @@ ARCH=arm-fsl
 #fi
 
 PCROSS_TOOL_PATH=$3
+CROSS=${PCROSS_TOOL_PATH##*/}
 fstr=${PCROSS_TOOL_PATH%/*}
 fstr=${fstr%/*}
+
+echo "====cross"=$CROSS
 
 export AQROOT=`pwd`
 export AQARCH=$AQROOT/arch/XAQ2
@@ -56,10 +59,11 @@ arm-fsl)
     export FIXED_ARCH_TYPE=$1
 
 	export KERNEL_DIR=$2
-    export CROSS_COMPILE=aarch64-linux-gnu-
+    export CROSS_COMPILE=$CROSS
 	export TOOLCHAIN=$fstr/bin
 	export LIB_DIR=$fstr/libc/lib
 	export PATH=$TOOLCHAIN:$PATH
+
 ;;
 
 arm-yocto)
