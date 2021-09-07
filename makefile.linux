@@ -337,7 +337,7 @@ clean:   all
 
 install: all
 	@mkdir -p $(SDK_DIR)
-	@-cp -f $(AQROOT)/release/SW/ReadMe_Linux_SDK.txt $(SDK_DIR)/ReadMe.txt
+	#@-cp -f $(AQROOT)/release/SW/ReadMe_Linux_SDK.txt $(SDK_DIR)/ReadMe.txt
 
 .PHONY: $(SUBDIRS)
 $(SUBDIRS):
