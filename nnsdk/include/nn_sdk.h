@@ -172,7 +172,10 @@ typedef enum {
     AML_PROFILE_NONE         = 0,
     AML_PROFILE_PERFORMANCE  = 1,
     AML_PROFILE_BANDWIDTH    = 2,
-    AML_PROFILE_MEMORY       = 3
+    AML_PROFILE_MEMORY       = 3,
+    AML_PERLAYER_RUNTIME     = 4,
+    AML_PERLAYER_BANDWIDTH   = 5,
+    AML_PERLAYER_OUTPUT      = 6
 } aml_profile_type_t;
 
 typedef enum {
