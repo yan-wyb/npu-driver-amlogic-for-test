@@ -172,14 +172,20 @@ static int import_page_map(gckOS Os, struct um_desc *um,
 
     down_read(&current_mm_mmap_sem);
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 9, 0) && LINUX_VERSION_CODE < KERNEL_VERSION(4, 10, 0)
+    result = get_user_pages_longterm(
+#else
     result = get_user_pages(
+#endif
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0)
             current,
             current->mm,
 #endif
             addr & PAGE_MASK,
             page_count,
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 9, 0) || defined(CONFIG_PPC)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0)
+            FOLL_WRITE | FOLL_LONGTERM,
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 9, 0) || defined(CONFIG_PPC)
             FOLL_WRITE,
 #else
             1,
