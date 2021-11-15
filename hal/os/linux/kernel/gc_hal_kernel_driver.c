@@ -257,6 +257,10 @@ static int smallBatch = 1;
 module_param(smallBatch, int, 0644);
 MODULE_PARM_DESC(smallBatch, "Enable/disable GPU small batch feature, enable by default");
 
+int aml_debuglevel = 0;
+module_param(aml_debuglevel, int, 0644);
+MODULE_PARM_DESC(aml_debuglevel, "aml_debug_level");
+
 static int allMapInOne = 1;
 module_param(allMapInOne, int, 0644);
 MODULE_PARM_DESC(allMapInOne, "Mapping kernel video memory to user, 0 means mapping every time, otherwise only mapping one time");

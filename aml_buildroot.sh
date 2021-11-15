@@ -292,7 +292,7 @@ esac;
 #                                      This option has an effect only when gcdENABLE_BANK_ALIGNMENT is enabled.
 #
 
-BUILD_OPTION_DEBUG=0
+BUILD_OPTION_DEBUG=1
 BUILD_OPTION_ABI=0
 BUILD_OPTION_LINUX_OABI=0
 BUILD_OPTION_NO_DMA_COHERENT=1

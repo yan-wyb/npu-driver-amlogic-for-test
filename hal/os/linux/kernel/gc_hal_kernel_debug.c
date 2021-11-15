@@ -62,11 +62,12 @@
 
 static gceSTATUS _lastError  = gcvSTATUS_OK;
 static gctUINT32 _debugLevel = gcvLEVEL_ERROR;
+extern int aml_debuglevel;
 /*
 _debugZones config value
 Please Reference define in gc_hal_base.h
 */
-static gctUINT32 _debugZones = gcdZONE_NONE;
+static gctUINT32 _debugZones = gcdZONE_ALL;/*gcdZONE_NONE ==> gcdZONE_ALL*/
 
 /******************************************************************************\
 ********************************* Debug Switches *******************************
@@ -540,6 +541,7 @@ gckOS_DebugTrace(
     ...
     )
 {
+    _debugLevel = aml_debuglevel;
     if (Level > _debugLevel)
     {
         return;
@@ -581,6 +583,7 @@ gckOS_DebugTraceZone(
     ...
     )
 {
+    _debugLevel = aml_debuglevel;
     if ((Level > _debugLevel) || !(Zone & _debugZones))
     {
         return;
