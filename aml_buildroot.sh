@@ -59,7 +59,7 @@ arm-fsl)
     export FIXED_ARCH_TYPE=$1
 
 	export KERNEL_DIR=$2
-    export CROSS_COMPILE=$CROSS
+    export CROSS_COMPILE=aarch64-linux-gnu-
 	export TOOLCHAIN=$fstr/bin
 	export LIB_DIR=$fstr/libc/lib
 	export PATH=$TOOLCHAIN:$PATH
