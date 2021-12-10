@@ -67,7 +67,6 @@
 #include <dt-bindings/clock/g12a-clkc.h>
 #else
 #include <dt-bindings/clock/amlogic,g12a-clkc.h>
-#include <linux/amlogic/power_domain.h>
 #endif
 
 #define NN_PD_0X99 16
@@ -171,7 +170,7 @@ gceSTATUS _AdjustParam(IN gcsPLATFORM *Platform,OUT gcsMODULE_PARAMETERS *Args)
         Args->extSRAMBases[0] = (gctPHYS_ADDR_T)res->start;
 
         Args->contiguousBase = 0;
-        Args->contiguousSize = 0x200000;/*(gctSIZE_T)(res->end - res->start+1);*/
+		Args->contiguousSize = 0x200000;/*(gctSIZE_T)(res->end - res->start+1);*/
     }
     else
     {
@@ -293,11 +292,27 @@ void Getpower_88(struct platform_device *pdev)
 }
 void Getpower_99(struct platform_device *pdev)
 {
-#if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 10, 0))
-    power_domain_switch(NN_PD_0X99,PWR_ON);
-#endif
+	uint32_t readReg = 0;
+	_RegRead(AO_RTI_GEN_PWR_SLEEP0,&readReg);
+	readReg = (readReg & 0xfffeffff);
+	_RegWrite(AO_RTI_GEN_PWR_SLEEP0, readReg);
 
-    set_clock(pdev);
+	_RegWrite(HHI_NANOQ_MEM_PD_REG0, 0x0);
+	_RegWrite(HHI_NANOQ_MEM_PD_REG1, 0x0);
+
+	_RegRead(RESET_LEVEL2,&readReg);
+	readReg = (readReg & 0xffffefff);
+	_RegWrite(RESET_LEVEL2, readReg);
+
+	_RegRead(AO_RTI_GEN_PWR_ISO0,&readReg);
+	readReg = (readReg & 0xfffeffff);
+	_RegWrite(AO_RTI_GEN_PWR_ISO0, readReg);
+
+	_RegRead(RESET_LEVEL2,&readReg);
+	readReg = (readReg | (0x1<<12));
+	_RegWrite(RESET_LEVEL2, readReg);
+
+	set_clock(pdev);
 }
 void Getpower_a1(struct platform_device *pdev)
 {
@@ -330,11 +345,22 @@ void Downpower_88(void)
 }
 void Downpower_99(void)
 {
+	unsigned int readReg=0;
 
-#if (LINUX_VERSION_CODE <= KERNEL_VERSION(4, 10, 0))
-    power_domain_switch(NN_PD_0X99,PWR_OFF);
-#endif
+	_RegRead(RESET_LEVEL2,&readReg);
+	readReg = (readReg & (~(0x1<<12)));
+	_RegWrite(RESET_LEVEL2, readReg);
 
+	_RegRead(AO_RTI_GEN_PWR_ISO0,&readReg);
+	readReg = (readReg | 0x10000);
+	_RegWrite(AO_RTI_GEN_PWR_ISO0, readReg);
+
+	_RegWrite(HHI_NANOQ_MEM_PD_REG0, 0xffffffff);
+	_RegWrite(HHI_NANOQ_MEM_PD_REG1, 0xffffffff);
+
+	_RegRead(AO_RTI_GEN_PWR_SLEEP0,&readReg);
+	readReg = (readReg | 0x10000);
+	_RegWrite(AO_RTI_GEN_PWR_SLEEP0, readReg);
 }
 void Downpower_a1(void)
 {
@@ -389,7 +415,6 @@ void Runtime_getpower_be(struct platform_device *pdev)
 }
 void Runtime_downpower_be(struct platform_device *pdev)
 {
-
     pm_runtime_put_sync(&pdev->dev);
     pm_runtime_disable(&pdev->dev);
 }
@@ -412,10 +437,6 @@ gceSTATUS _GetPower(IN gcsPLATFORM *Platform)
             break;
         case 4:
             nanoqFreq=666*1024*1024;
-            Getpower_be(pdev);
-            break;
-        case 5:
-            nanoqFreq=852*1024*1024;
             Getpower_be(pdev);
             break;
         default:
@@ -444,9 +465,6 @@ gceSTATUS  _SetPower(IN gcsPLATFORM * Platform,IN gceCORE GPU,IN gctBOOL Enable)
             case 4:
                 Runtime_downpower_be(pdev);
                 break;
-            case 5:
-                Runtime_downpower_be(pdev);
-                break;
             default:
                 printk("not find power_version\n");
                 break;
@@ -467,9 +485,6 @@ gceSTATUS  _SetPower(IN gcsPLATFORM * Platform,IN gceCORE GPU,IN gctBOOL Enable)
                 Runtime_getpower_99(pdev);
                 break;
             case 4:
-                Runtime_getpower_be(pdev);
-                break;
-            case 5:
                 Runtime_getpower_be(pdev);
                 break;
             default:
@@ -507,11 +522,6 @@ gceSTATUS _Reset(IN gcsPLATFORM * Platform, IN gceCORE GPU)
             mdelay(10);
             Runtime_getpower_be(pdev);
             break;
-        case 5:
-            Runtime_downpower_be(pdev);
-            mdelay(10);
-            Runtime_getpower_be(pdev);
-            break;
         default:
             printk("not find power_version\n");
             break;
@@ -544,9 +554,6 @@ gceSTATUS _DownPower(IN gcsPLATFORM *Platform)
         case 4:
             Downpower_be();
             break;
-        case 5:
-            Downpower_be();
-            break;
         default:
             printk("not find power_version\n");
             break;
@@ -564,7 +571,6 @@ _GetPowerStatus(IN gcsPLATFORM *Platform,OUT gctUINT32_PTR  pstat)
 
 gceSTATUS _SetPolicy(IN gcsPLATFORM *Platform,IN gctUINT32  powerLevel)
 {
-    //printk("nn_power_version:%d\n",nn_power_version);
     switch (nn_power_version)
     {
         case 1:
@@ -579,9 +585,6 @@ gceSTATUS _SetPolicy(IN gcsPLATFORM *Platform,IN gctUINT32  powerLevel)
         case 4:
             nanoqFreq=666*1024*1024;
             break;
-        case 5:
-            nanoqFreq=852*1024*1024;
-            break;
         default:
             nanoqFreq=800000000;
             break;
@@ -591,7 +594,7 @@ gceSTATUS _SetPolicy(IN gcsPLATFORM *Platform,IN gctUINT32  powerLevel)
     {
         nanoqFreq = nanoqFreq/2;
     }
-    else if(powerLevel == 3)
+    else if (powerLevel == 3)
     {
         nanoqFreq = nanoqFreq/4;
     }
