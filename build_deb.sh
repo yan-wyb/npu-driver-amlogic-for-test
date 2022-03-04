@@ -1,18 +1,25 @@
 #!/bin/bash
 
-FENIX=$1
-patchversion=$2
+LINUX_DIR=$1
+TOOLCHAIN_DIR=$2
+#patchversion=$2
 
-if [ -z $FENIX ]; then
-	echo "usage: $0 <Fenix Repo> [patchversion]"
+if [ -z $LINUX_DIR ]; then
+	echo "usage: $0 <Linux DIR> <Toolchain DIR>"
 	exit
 fi
+
+if [ -z $TOOLCHAIN_DIR ]; then
+    echo "usage: $0 <Linux DIR> <Toolchain DIR>"
+    exit
+fi
+
 
 ROOT=`pwd`
 DDK_VERSION=`cat $ROOT/VERSION | grep "Release ID" | awk '{print $3}'`
 TARGET_DIR="$ROOT/.temp"
-LINUX_DIR="$FENIX/build/linux"
-TOOLCHAIN_DIR="$FENIX/build/toolchains/gcc-linaro-aarch64-linux-gnu/bin/"
+#LINUX_DIR="$FENIX/build/linux"
+#TOOLCHAIN_DIR="$FENIX/build/toolchains/gcc-linaro-aarch64-linux-gnu/bin/"
 LINUX_VERSION_PROBED=`cat $LINUX_DIR/.config | grep "Linux/arm64" | awk '{print $3}'`
 
 
